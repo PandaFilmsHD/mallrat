@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mallrat</title>
+<meta name="theme-color" content="#0a0f16">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mallrat">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
+<style>
+  :root{
+    --bg:#0a0f16; --panel:#111923; --panel2:#18222f; --line:#243244;
+    --text:#eef5fb; --dim:#8fa1b5; --accent:#8fd0ff; --accent2:#4fa8e0; --bad:#ff7a7a;
+    --safe-top:env(safe-area-inset-top); --safe-bot:env(safe-area-inset-bottom);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif}
+  body{min-height:100vh;padding-bottom:calc(24px + var(--safe-bot))}
+  button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+  header{position:sticky;top:0;z-index:10;background:rgba(10,15,22,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    padding:calc(10px + var(--safe-top)) 14px 10px;border-bottom:1px solid var(--line)}
+  .top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .logo{font-weight:800;font-size:22px;letter-spacing:-.5px}
+  .logo span{color:var(--accent)}
+  .iconbtn{margin-left:auto;width:36px;height:36px;border-radius:12px;background:var(--panel2);display:grid;place-items:center;font-size:18px}
+  form{display:flex;gap:8px}
+  input[type=search],input[type=text]{flex:1;min-width:0;background:var(--panel2);border:1px solid var(--line);color:var(--text);
+    border-radius:14px;padding:12px 14px;font-size:16px;outline:none}
+  input:focus{border-color:var(--accent2)}
+  .go{background:var(--accent);color:#06223a;font-weight:700;border-radius:14px;padding:0 18px}
+  .storebar{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
+  .storebar::-webkit-scrollbar{display:none}
+  .chip{flex:none;padding:8px 12px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);font-size:14px;color:var(--dim);white-space:nowrap}
+  .chip.on{background:rgba(143,208,255,.14);border-color:var(--accent2);color:var(--text)}
+  .chip.on::before{content:"✓ ";color:var(--accent)}
+  .chip.meta{color:var(--accent)}
+  main{padding:12px 14px 0}
+  .status{color:var(--dim);font-size:13px;margin:2px 2px 10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .filters{display:flex;gap:6px;overflow-x:auto;margin:0 0 12px;scrollbar-width:none}
+  .filters::-webkit-scrollbar{display:none}
+  .filters .chip{font-size:13px;padding:6px 10px}
+  .filters .chip.on::before{content:""}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  @media(min-width:700px){.grid{grid-template-columns:repeat(3,1fr)}}
+    .card{display:block;background:var(--panel);border-radius:16px;overflow:hidden;text-decoration:none;color:inherit;border:1px solid var(--line)}
+  .imgwrap{position:relative;aspect-ratio:3/4;background:var(--panel2)}
+  .imgwrap img{width:100%;height:100%;object-fit:cover;display:block}
+  .badge{position:absolute;left:8px;top:8px;background:rgba(10,15,22,.8);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+    padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700}
+  .heart{position:absolute;right:6px;top:6px;width:32px;height:32px;border-radius:50%;background:rgba(10,15,22,.7);display:grid;place-items:center;font-size:16px}
+  .heart.on{color:var(--accent)}
+  .meta2{padding:8px 10px 10px;font-size:13px;line-height:1.3;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .skel{aspect-ratio:3/4.6;border-radius:16px;background:linear-gradient(90deg,var(--panel) 0%,var(--panel2) 50%,var(--panel) 100%);background-size:200% 100%;animation:sh 1.2s infinite}
+  @keyframes sh{to{background-position:-200% 0}}
+  .empty{text-align:center;color:var(--dim);padding:40px 20px;line-height:1.5}
+  .empty b{color:var(--text)}
+  .more{display:block;margin:16px auto 0;background:var(--panel2);border:1px solid var(--line);padding:12px 20px;border-radius:14px}
+  .fallback{display:grid;gap:8px;margin-top:10px}
+  .fallback a{display:flex;justify-content:space-between;background:var(--panel);border:1px solid var(--line);padding:14px;border-radius:14px;color:var(--text);text-decoration:none}
+  .fallback a span{color:var(--accent)}
+  .sheet{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:50;align-items:flex-end;justify-content:center}
+  .sheet.open{display:flex}
+  .sheetbox{background:var(--panel);width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:18px 16px calc(20px + var(--safe-bot));max-height:88vh;overflow:auto;border-top:1px solid var(--line)}
+  .sheetbox h2{margin:0 0 6px;font-size:19px}
+  .sheetbox p{color:var(--dim);font-size:14px;line-height:1.45;margin:6px 0 12px}
+  .sheetbox a{color:var(--accent)}
+  .row{display:flex;gap:8px;margin:8px 0}
+  .btn{background:var(--panel2);border:1px solid var(--line);padding:11px 14px;border-radius:12px}
+  .btn.primary{background:var(--accent);color:#06223a;font-weight:700;border:0}
+  .storelist{display:grid;gap:6px;margin:8px 0 14px}
+  .storeitem{display:flex;align-items:center;gap:10px;background:var(--panel2);padding:10px 12px;border-radius:12px;font-size:14px}
+  .storeitem small{color:var(--dim);margin-left:auto}
+  .x{color:var(--bad);padding:2px 6px}
+  .credits{color:var(--accent)}
+  .err{color:var(--bad)}
+  hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+
+  .wrap{max-width:1180px;margin:0 auto}
+  .card{transition:transform .15s ease,border-color .15s ease}
+  .card:active{transform:scale(.98)}
+  @media(hover:hover){.card:hover{transform:translateY(-3px);border-color:var(--accent2)} .chip:hover{border-color:var(--accent2)} .go:hover{filter:brightness(1.08)}}
+  .go{transition:filter .15s}
+  .logo{background:linear-gradient(90deg,#eef5fb,#8fd0ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .logo span{color:transparent}
+  @media(min-width:700px){
+    header{padding:16px 0 12px} header .wrap{padding:0 24px}
+    main{padding:18px 24px 0}
+    .storebar{flex-wrap:wrap;overflow:visible}
+    .filters{flex-wrap:wrap;overflow:visible}
+    .grid{gap:16px}
+    .meta2{font-size:14px}
+    .sheet{align-items:center}
+    .sheetbox{border-radius:22px;border:1px solid var(--line);max-height:80vh}
+    form{max-width:720px}
+  }
+  @media(min-width:1000px){.grid{grid-template-columns:repeat(4,1fr)}}
+  @media(min-width:1250px){.grid{grid-template-columns:repeat(5,1fr)}}
+</style>
+</head>
+<body>
+<header>
+<div class="wrap">
+  <div class="top">
+    <div class="logo">mall<span>rat</span></div>
+    <button class="iconbtn" id="favBtn" title="Saved">♡</button>
+    <button class="iconbtn" id="setBtn" style="margin-left:0" title="Settings">⚙︎</button>
+  </div>
+  <form id="f">
+    <input type="search" id="q" placeholder="white tube top…" autocomplete="off" enterkeyhint="search">
+    <button class="go" type="submit">Search</button>
+  </form>
+  <div class="storebar" id="storebar"></div>
+</div>
+</header>
+
+<main class="wrap">
+  <div class="status" id="status"></div>
+  <div class="filters" id="filters"></div>
+  <div class="grid" id="grid"></div>
+  <div id="below"></div>
+</main>
+
+<div class="sheet" id="sheet"><div class="sheetbox" id="sheetbox"></div></div>
+
+<script>
+const DEFAULT_STORES = [
+  {id:'aritzia', name:'Aritzia', domain:'aritzia.com', url:'https://www.aritzia.com/us/en/search?q='},
+  {id:'freepeople', name:'Free People', domain:'freepeople.com', url:'https://www.freepeople.com/search/?q='},
+  {id:'lulu', name:'Lululemon', domain:'lululemon.com', url:'https://shop.lululemon.com/search?Ntt='},
+  {id:'alo', name:'Alo', domain:'aloyoga.com', url:'https://www.aloyoga.com/search?q='},
+  {id:'brandy', name:'Brandy Melville', domain:'brandymelville.com', url:'https://us.brandymelville.com/search?q='},
+  {id:'polly', name:'Princess Polly', domain:'princesspolly.com', url:'https://us.princesspolly.com/search?q='},
+  {id:'skims', name:'Skims', domain:'skims.com', url:'https://skims.com/search?q='},
+  {id:'zara', name:'Zara', domain:'zara.com', url:'https://www.zara.com/us/en/search?searchTerm='},
+  {id:'af', name:'Abercrombie', domain:'abercrombie.com', url:'https://www.abercrombie.com/shop/us/search?searchTerm='},
+  {id:'anthro', name:'Anthropologie', domain:'anthropologie.com', url:'https://www.anthropologie.com/search?q='},
+  {id:'dd', name:'Daily Drills', domain:'shopdailydrills.com', url:'https://shopdailydrills.com/search?q='},
+];
+
+const $ = s => document.querySelector(s);
+const ls = {
+  get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+
+// key can be passed once as #key=xxxx (so you can text someone a setup link)
+(function(){
+  const m = location.hash.match(/key=([^&]+)/);
+  if(m){ ls.set('apiKey', decodeURIComponent(m[1])); history.replaceState(null,'',location.pathname+location.search); }
+})();
+
+let stores = ls.get('stores', DEFAULT_STORES);
+let selected = new Set(ls.get('selected', stores.map(s=>s.id)));
+let favs = ls.get('favs', []);
+let state = {q:'', page:1, results:[], filter:'all', perStore:{}, errors:{}, loading:false};
+
+function storeById(id){return stores.find(s=>s.id===id)}
+
+function renderStoreBar(){
+  const bar = $('#storebar'); bar.innerHTML='';
+  const all = document.createElement('button');
+  const allOn = selected.size===stores.length;
+  all.className='chip meta'; all.textContent = allOn ? 'Clear all' : 'Select all';
+  all.onclick=()=>{ selected = allOn ? new Set() : new Set(stores.map(s=>s.id)); save(); renderStoreBar(); };
+  bar.appendChild(all);
+  stores.forEach(s=>{
+    const b=document.createElement('button');
+    b.className='chip'+(selected.has(s.id)?' on':''); b.textContent=s.name;
+    b.onclick=()=>{ selected.has(s.id)?selected.delete(s.id):selected.add(s.id); save(); renderStoreBar(); };
+    bar.appendChild(b);
+  });
+}
+function save(){ ls.set('selected',[...selected]); ls.set('stores',stores); ls.set('favs',favs); }
+
+// ---------- search ----------
+const NON_PRODUCT = /(\/blogs?\/|\/pages\/|\/search|\/stores?\/|\/help|\/careers|instagram|pinterest|\/c\/[^/]*$)/i;
+
+async function searchStore(store, q, page, key){
+  const cacheKey = `c:${store.domain}:${q.toLowerCase()}:${page}`;
+  const cached = sessionStorage.getItem(cacheKey);
+  if(cached) return JSON.parse(cached);
+  const res = await fetch('https://google.serper.dev/images',{
+    method:'POST',
+    headers:{'X-API-KEY':key,'Content-Type':'application/json'},
+    body:JSON.stringify({q:`${q} site:${store.domain}`, gl:'us', hl:'en', num:10, page})
+  });
+  if(!res.ok){
+    let msg = res.status===401||res.status===403 ? 'API key not working' : res.status===400 ? 'Out of credits or bad request' : 'Error '+res.status;
+    throw new Error(msg);
+  }
+  const data = await res.json();
+  if(data.credits!=null) ls.set('creditsUsedLast', data.credits);
+  const seen = new Set();
+  const items = (data.images||[]).filter(it=>{
+    if(!it.link || !it.imageUrl) return false;
+    if(!it.link.includes(store.domain.split('.')[0])) return false;
+    if(NON_PRODUCT.test(it.link)) return false;
+    const k = it.link.split('?')[0];
+    if(seen.has(k)) return false; seen.add(k); return true;
+  }).map(it=>({
+    store:store.id, title:cleanTitle(it.title, store), link:it.link,
+    img:it.imageUrl, thumb:it.thumbnailUrl
+  }));
+  try{sessionStorage.setItem(cacheKey, JSON.stringify(items))}catch(e){}
+  return items;
+}
+function cleanTitle(t, store){
+  if(!t) return store.name;
+  return t.replace(new RegExp('\\s*[|\\-–—]\\s*'+store.name.split(' ')[0]+'.*$','i'),'')
+          .replace(/\s*[|]\s*.*$/,'').trim() || store.name;
+}
+
+async function runSearch(q, page=1){
+  const key = ls.get('apiKey','');
+  if(!key){ openSettings(true); return; }
+  const chosen = stores.filter(s=>selected.has(s.id));
+  if(!chosen.length){ setStatus('Pick at least one store up top'); return; }
+  if(page===1){ state = {q, page:1, results:[], filter:'all', perStore:{}, errors:{}, loading:true}; ls.set('lastQ', q); }
+  state.loading = true; state.page = page;
+  if(page===1){ $('#grid').innerHTML = Array(8).fill('<div class="skel"></div>').join(''); $('#filters').innerHTML=''; $('#below').innerHTML=''; }
+  setStatus(`Searching ${chosen.length} store${chosen.length>1?'s':''}…`);
+
+  const lists = await Promise.all(chosen.map(s =>
+    searchStore(s, q, page, key).then(r=>({s,r})).catch(e=>({s,r:[],e:e.message||'Failed'}))
+  ));
+  // interleave so the feed is mixed, not all Aritzia then all Alo
+  const fresh=[]; const max=Math.max(0,...lists.map(l=>l.r.length));
+  for(let i=0;i<max;i++) lists.forEach(l=>{ if(l.r[i]) fresh.push(l.r[i]); });
+  const have = new Set(state.results.map(r=>r.link));
+  fresh.forEach(r=>{ if(!have.has(r.link)) state.results.push(r); });
+  lists.forEach(l=>{ state.perStore[l.s.id]=(state.perStore[l.s.id]||0)+l.r.length; if(l.e) state.errors[l.s.id]=l.e; });
+  state.loading=false;
+
+  const allFailed = lists.every(l=>l.e);
+  if(allFailed){ renderFailure(lists[0].e, q, chosen); return; }
+  render();
+}
+
+function render(){
+  const grid=$('#grid');
+  const items = state.filter==='all' ? state.results : state.results.filter(r=>r.store===state.filter);
+  const errs = Object.keys(state.errors);
+  setStatus(`<b>${state.results.length}</b> finds for “${esc(state.q)}”` + (errs.length?` · <span class="err">${errs.map(id=>storeById(id)?.name).join(', ')} didn't load</span>`:''));
+
+  // per-store filter chips
+  const f=$('#filters'); f.innerHTML='';
+  const mk=(id,label)=>{const b=document.createElement('button');b.className='chip'+(state.filter===id?' on':'');b.textContent=label;b.onclick=()=>{state.filter=id;render();window.scrollTo({top:0,behavior:'smooth'})};f.appendChild(b)};
+  mk('all',`All ${state.results.length}`);
+  Object.entries(state.perStore).filter(([,n])=>n>0).forEach(([id,n])=>mk(id,`${storeById(id)?.name} ${state.results.filter(r=>r.store===id).length}`));
+
+  if(!items.length){
+    grid.innerHTML='';
+    $('#below').innerHTML = `<div class="empty">Nothing came back for that one. Try simpler words (like “tube top” instead of “ribbed strapless tube top”).</div>` + fallbackLinks(state.q, stores.filter(s=>selected.has(s.id)));
+    return;
+  }
+  grid.innerHTML = items.map(cardHTML).join('');
+  wireCards(grid);
+  $('#below').innerHTML = `<button class="more" id="moreBtn">Load more</button>
+    <details style="margin-top:18px;color:var(--dim);font-size:14px"><summary>Open the stores' own search pages</summary>${fallbackLinks(state.q, stores.filter(s=>selected.has(s.id)))}</details>`;
+  $('#moreBtn').onclick=e=>{e.target.textContent='Loading…';runSearch(state.q, state.page+1)};
+}
+
+function cardHTML(r){
+  const s=storeById(r.store)||{name:r.store};
+  const isFav = favs.some(f=>f.link===r.link);
+  return `<a class="card" href="${attr(r.link)}" target="_blank" rel="noopener">
+    <div class="imgwrap">
+      <img loading="lazy" src="${attr(r.img)}" data-thumb="${attr(r.thumb||'')}" alt="">
+      <span class="badge">${esc(s.name)}</span>
+      <button class="heart${isFav?' on':''}" data-link="${attr(r.link)}">${isFav?'♥':'♡'}</button>
+    </div>
+    <div class="meta2">${esc(r.title)}</div>
+  </a>`;
+}
+function wireCards(root){
+  root.querySelectorAll('img').forEach(img=>{
+    img.onerror=()=>{ const t=img.dataset.thumb; if(t && img.src!==t){img.src=t}else{img.closest('.card').style.display='none'} };
+  });
+  root.querySelectorAll('.heart').forEach(h=>h.onclick=e=>{
+    e.preventDefault(); e.stopPropagation();
+    const link=h.dataset.link; const i=favs.findIndex(f=>f.link===link);
+    if(i>=0){favs.splice(i,1);h.classList.remove('on');h.textContent='♡'}
+    else{const r=state.results.find(x=>x.link===link)||favs.find(x=>x.link===link); if(r){favs.unshift(r);h.classList.add('on');h.textContent='♥'}}
+    save();
+  });
+}
+
+function fallbackLinks(q, list){
+  return `<div class="fallback">${list.map(s=>`<a href="${attr(s.url+encodeURIComponent(q))}" target="_blank" rel="noopener">${esc(s.name)} <span>open ↗</span></a>`).join('')}</div>`;
+}
+function renderFailure(msg, q, chosen){
+  $('#grid').innerHTML=''; $('#filters').innerHTML='';
+  setStatus(`<span class="err">${esc(msg)}</span>`);
+  $('#below').innerHTML = `<div class="empty"><b>Couldn't load the photo feed.</b><br>${msg.includes('key')?'Double check your key in settings (⚙︎).':msg.includes('credits')?'Your free searches might be used up.':'Could be your connection.'}<br>Meanwhile, here are those stores' own search pages:</div>` + fallbackLinks(q, chosen);
+}
+
+function setStatus(h){ $('#status').innerHTML=h; }
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function attr(s){return esc(s)}
+
+// ---------- saved ----------
+function showFavs(){
+  state.filter='all';
+  setStatus(`<b>${favs.length}</b> saved`);
+  $('#filters').innerHTML='';
+  const grid=$('#grid');
+  if(!favs.length){ grid.innerHTML=''; $('#below').innerHTML='<div class="empty">Tap the ♡ on anything to save it here.</div>'; return; }
+  grid.innerHTML=favs.map(cardHTML).join(''); wireCards(grid);
+  $('#below').innerHTML='';
+}
+
+// ---------- settings ----------
+function openSettings(needKey){
+  const key = ls.get('apiKey','');
+  $('#sheetbox').innerHTML = `
+    <h2>${needKey?'One time setup':'Settings'}</h2>
+    <p>The photo feed runs on a free <b>Serper</b> key (Google results, limited to each store's site).
+    Sign up at <a href="https://serper.dev" target="_blank" rel="noopener">serper.dev</a>, no card needed, copy the API key from your dashboard and paste it here. It's only saved on this phone.</p>
+    <div class="row"><input type="text" id="keyIn" placeholder="paste API key" value="${attr(key)}" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+    <div class="row"><button class="btn primary" id="saveKey">Save</button><button class="btn" id="closeS">Close</button></div>
+    <p style="font-size:12px">Each store you search uses 1 free credit, so 11 stores = 11 credits. Repeat searches in the same session are free (cached).</p>
+    <hr>
+    <h2>Stores</h2>
+    <div class="storelist">${stores.map(s=>`<div class="storeitem">${esc(s.name)}<small>${esc(s.domain)}</small><button class="x" data-del="${s.id}">✕</button></div>`).join('')}</div>
+    <p style="margin-bottom:6px">Add a store (name + website, like <i>Edikted</i> + <i>edikted.com</i>)</p>
+    <div class="row"><input type="text" id="newName" placeholder="Store name"><input type="text" id="newDom" placeholder="site.com" autocapitalize="off"></div>
+    <div class="row"><button class="btn" id="addStore">Add store</button><button class="btn" id="resetStores">Reset to default</button></div>
+  `;
+  $('#sheet').classList.add('open');
+  $('#saveKey').onclick=()=>{ ls.set('apiKey',$('#keyIn').value.trim()); closeSheet(); const q=$('#q').value.trim(); if(q) runSearch(q); };
+  $('#closeS').onclick=closeSheet;
+  $('#sheetbox').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ stores=stores.filter(s=>s.id!==b.dataset.del); selected.delete(b.dataset.del); save(); renderStoreBar(); openSettings(); });
+  $('#addStore').onclick=()=>{
+    const name=$('#newName').value.trim(); let dom=$('#newDom').value.trim().toLowerCase().replace(/^https?:\/\//,'').replace(/^www\./,'').replace(/\/.*$/,'');
+    if(!name||!dom) return;
+    const id='s'+Date.now();
+    stores.push({id,name,domain:dom,url:`https://www.google.com/search?q=site%3A${dom}+`}); selected.add(id); save(); renderStoreBar(); openSettings();
+  };
+  $('#resetStores').onclick=()=>{ stores=DEFAULT_STORES.slice(); selected=new Set(stores.map(s=>s.id)); save(); renderStoreBar(); openSettings(); };
+}
+function closeSheet(){ $('#sheet').classList.remove('open'); }
+$('#sheet').onclick=e=>{ if(e.target.id==='sheet') closeSheet(); };
+
+// ---------- wire up ----------
+$('#f').onsubmit=e=>{ e.preventDefault(); const q=$('#q').value.trim(); if(q){ $('#q').blur(); runSearch(q); } };
+$('#setBtn').onclick=()=>openSettings(false);
+$('#favBtn').onclick=showFavs;
+renderStoreBar();
+const lastQ = ls.get('lastQ','');
+if(lastQ) $('#q').value=lastQ;
+if(!ls.get('apiKey','')) setStatus('Tap ⚙︎ to add your free search key first');
+else setStatus('Pick your stores, then search');
+$('#below').innerHTML = `<div class="empty">Search once, see every store.<br><b>Add to home screen:</b> in Safari tap Share → “Add to Home Screen”.</div>`;
+
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
