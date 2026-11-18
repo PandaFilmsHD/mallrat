@@ -194,7 +194,7 @@ const ls = {
 // key can be passed once as #key=xxxx (so you can text someone a setup link)
 (function(){
   const m = location.hash.match(/key=([^&]+)/);
-  if(m){ ls.set('apiKey', decodeURIComponent(m[1])); history.replaceState(null,'',location.pathname+location.search); }
+  if(m){ ls.set('apiKey', decodeURIComponent(m[1])); } // keep #key in the URL so Add to Home Screen carries it over
 })();
 
 let stores = ls.get('stores', DEFAULT_STORES);
@@ -233,7 +233,7 @@ async function searchStore(store, q, page, key){
     body:JSON.stringify({q:`${q} site:${store.domain}`, gl:'us', hl:'en', num:10, page})
   });
   if(!res.ok){
-    let msg = res.status===401||res.status===403 ? 'API key not working' : res.status===400 ? 'Out of credits or bad request' : 'Error '+res.status;
+    let msg = res.status===401||res.status===403 ? 'Search key not working' : res.status===400 ? 'Out of credits or bad request' : 'Error '+res.status;
     throw new Error(msg);
   }
   const data = await res.json();
@@ -338,7 +338,7 @@ function fallbackLinks(q, list){
 function renderFailure(msg, q, chosen){
   $('#grid').innerHTML=''; $('#filters').innerHTML='';
   setStatus(`<span class="err">${esc(msg)}</span>`);
-  $('#below').innerHTML = `<div class="empty"><b>Couldn't load the photo feed.</b><br>${msg.includes('key')?'Double check your key in settings (⚙︎).':msg.includes('credits')?'Your free searches might be used up.':'Could be your connection.'}<br>Meanwhile, here are those stores' own search pages:</div>` + fallbackLinks(q, chosen);
+  $('#below').innerHTML = `<div class="empty"><b>Couldn't load the photo feed.</b><br>${msg.includes('key')?'Double check the key in settings (gear icon).':msg.includes('credits')?'The free searches might be used up.':'Looks like a connection problem. Check your signal and try again.'}<br>Meanwhile, here are those stores' own search pages:</div>` + fallbackLinks(q, chosen);
 }
 
 function setStatus(h){ $('#status').innerHTML=h; }
