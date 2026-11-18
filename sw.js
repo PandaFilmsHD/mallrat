@@ -1,5 +1,5 @@
 // caches the app shell so it opens fast from the home screen; search results always come live
-const C = 'mallrat-v2';
+const C = 'mallrat-v3';
 const SHELL = ['./', 'index.html', 'manifest.json', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(C).then(c => c.addAll(SHELL))); self.skipWaiting(); });
 self.addEventListener('activate', e => {

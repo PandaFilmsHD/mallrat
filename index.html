@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mallrat</title>
-<meta name="theme-color" content="#0a0f16">
+<meta name="theme-color" content="#060a12">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,89 +13,132 @@
 <link rel="manifest" href="manifest.json">
 <style>
   :root{
-    --bg:#0a0f16; --panel:#111923; --panel2:#18222f; --line:#243244;
-    --text:#eef5fb; --dim:#8fa1b5; --accent:#8fd0ff; --accent2:#4fa8e0; --bad:#ff7a7a;
+    --bg:#060a12; --panel:rgba(20,30,46,.62); --panel2:rgba(28,40,60,.7); --line:rgba(143,208,255,.14);
+    --text:#eef6ff; --dim:#8ea3bb; --accent:#8fd0ff; --accent2:#4fa8e0; --glow:rgba(110,190,255,.45); --bad:#ff8a8a;
     --safe-top:env(safe-area-inset-top); --safe-bot:env(safe-area-inset-bottom);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif}
-  body{min-height:100vh;padding-bottom:calc(24px + var(--safe-bot))}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,sans-serif}
+  body{min-height:100vh;padding-bottom:calc(30px + var(--safe-bot));overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:-20%;z-index:-2;pointer-events:none;
+    background:radial-gradient(40% 35% at 15% 10%,rgba(79,168,224,.42),transparent 70%),
+               radial-gradient(35% 30% at 90% 20%,rgba(143,208,255,.26),transparent 70%),
+               radial-gradient(45% 40% at 60% 95%,rgba(60,110,220,.32),transparent 70%);
+    animation:drift 18s ease-in-out infinite alternate}
+  body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.05;
+    background-image:radial-gradient(#fff 1px,transparent 1px);background-size:3px 3px}
+  @keyframes drift{to{transform:translate3d(4%,3%,0) scale(1.08)}}
   button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
-  header{position:sticky;top:0;z-index:10;background:rgba(10,15,22,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  svg{display:block}
+  .wrap{max-width:1180px;margin:0 auto}
+  header{position:sticky;top:0;z-index:10;background:rgba(6,10,18,.62);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);
     padding:calc(10px + var(--safe-top)) 14px 10px;border-bottom:1px solid var(--line)}
-  .top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-  .logo{font-weight:800;font-size:22px;letter-spacing:-.5px}
-  .logo span{color:var(--accent)}
-  .iconbtn{margin-left:auto;width:36px;height:36px;border-radius:12px;background:var(--panel2);display:grid;place-items:center;font-size:18px}
-  form{display:flex;gap:8px}
-  input[type=search],input[type=text]{flex:1;min-width:0;background:var(--panel2);border:1px solid var(--line);color:var(--text);
-    border-radius:14px;padding:12px 14px;font-size:16px;outline:none}
-  input:focus{border-color:var(--accent2)}
-  .go{background:var(--accent);color:#06223a;font-weight:700;border-radius:14px;padding:0 18px}
-  .storebar{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
+  .top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .logo{font-weight:900;font-size:26px;letter-spacing:-1px;display:flex;align-items:center;gap:8px;
+    background:linear-gradient(90deg,#ffffff,#8fd0ff,#4fa8e0,#ffffff);background-size:300% 100%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 8s linear infinite}
+  .logo i{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--glow),0 0 24px var(--glow)}
+  @keyframes shine{to{background-position:300% 0}}
+  .iconbtn{width:40px;height:40px;border-radius:14px;background:var(--panel2);border:1px solid var(--line);display:grid;place-items:center;transition:.15s}
+  .iconbtn:first-of-type{margin-left:auto}
+  .iconbtn svg{width:19px;height:19px;stroke:var(--text)}
+  form{display:flex;gap:8px;position:relative}
+  .searchbox{flex:1;min-width:0;position:relative}
+  .searchbox svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;stroke:var(--dim);pointer-events:none}
+  input[type=search],input[type=text]{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);
+    border-radius:16px;padding:13px 14px;font-size:16px;outline:none;transition:.2s}
+  input[type=search]{padding-left:42px}
+  input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(143,208,255,.12),0 0 24px rgba(143,208,255,.15)}
+  input::placeholder{color:#5f7590}
+  .go{background:linear-gradient(135deg,#bfe6ff,#8fd0ff 45%,#4fa8e0);color:#04182b;font-weight:800;border-radius:16px;padding:0 20px;
+    box-shadow:0 6px 22px rgba(79,168,224,.35);transition:.15s}
+  .go:active{transform:scale(.96)}
+  .storebar{display:flex;gap:8px;overflow-x:auto;padding:12px 0 2px;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,#000 90%,transparent)}
   .storebar::-webkit-scrollbar{display:none}
-  .chip{flex:none;padding:8px 12px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);font-size:14px;color:var(--dim);white-space:nowrap}
-  .chip.on{background:rgba(143,208,255,.14);border-color:var(--accent2);color:var(--text)}
-  .chip.on::before{content:"✓ ";color:var(--accent)}
-  .chip.meta{color:var(--accent)}
-  main{padding:12px 14px 0}
+  .chip{flex:none;padding:8px 13px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font-size:14px;color:var(--dim);white-space:nowrap;transition:.15s}
+  .chip:active{transform:scale(.95)}
+  .chip.on{background:linear-gradient(135deg,rgba(143,208,255,.22),rgba(79,168,224,.12));border-color:rgba(143,208,255,.55);color:#fff;box-shadow:0 0 14px rgba(143,208,255,.14)}
+  .chip.on::before{content:"✓ ";color:var(--accent);font-weight:700}
+  .chip.meta{color:var(--accent);border-style:dashed}
+  main{padding:14px 14px 0}
   .status{color:var(--dim);font-size:13px;margin:2px 2px 10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .filters{display:flex;gap:6px;overflow-x:auto;margin:0 0 12px;scrollbar-width:none}
+  .status b{color:var(--accent);font-size:15px}
+  .filters{display:flex;gap:6px;overflow-x:auto;margin:0 0 14px;scrollbar-width:none}
   .filters::-webkit-scrollbar{display:none}
-  .filters .chip{font-size:13px;padding:6px 10px}
+  .filters .chip{font-size:13px;padding:6px 11px}
   .filters .chip.on::before{content:""}
   .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-  @media(min-width:700px){.grid{grid-template-columns:repeat(3,1fr)}}
-    .card{display:block;background:var(--panel);border-radius:16px;overflow:hidden;text-decoration:none;color:inherit;border:1px solid var(--line)}
-  .imgwrap{position:relative;aspect-ratio:3/4;background:var(--panel2)}
-  .imgwrap img{width:100%;height:100%;object-fit:cover;display:block}
-  .badge{position:absolute;left:8px;top:8px;background:rgba(10,15,22,.8);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-    padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700}
-  .heart{position:absolute;right:6px;top:6px;width:32px;height:32px;border-radius:50%;background:rgba(10,15,22,.7);display:grid;place-items:center;font-size:16px}
-  .heart.on{color:var(--accent)}
-  .meta2{padding:8px 10px 10px;font-size:13px;line-height:1.3;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .skel{aspect-ratio:3/4.6;border-radius:16px;background:linear-gradient(90deg,var(--panel) 0%,var(--panel2) 50%,var(--panel) 100%);background-size:200% 100%;animation:sh 1.2s infinite}
-  @keyframes sh{to{background-position:-200% 0}}
-  .empty{text-align:center;color:var(--dim);padding:40px 20px;line-height:1.5}
+  .card{position:relative;display:block;border-radius:20px;overflow:hidden;text-decoration:none;color:inherit;border:1px solid var(--line);
+    background:var(--panel);aspect-ratio:3/4.2;transition:transform .2s ease,box-shadow .2s ease,border-color .2s;animation:pop .35s ease both}
+  @keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}}
+  .card:active{transform:scale(.97)}
+  .card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:#0e1622}
+  .card::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,10,18,0) 50%,rgba(6,10,18,.92) 100%);pointer-events:none}
+  .badge{position:absolute;z-index:2;left:8px;top:8px;background:rgba(6,10,18,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.12);padding:5px 9px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.2px}
+  .heart{position:absolute;z-index:2;right:8px;top:8px;width:34px;height:34px;border-radius:50%;background:rgba(6,10,18,.55);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.12);display:grid;place-items:center;transition:.15s}
+  .heart svg{width:16px;height:16px;stroke:#fff;fill:none}
+  .heart.on svg{fill:var(--accent);stroke:var(--accent);filter:drop-shadow(0 0 6px var(--glow))}
+  .heart:active{transform:scale(.85)}
+  .meta2{position:absolute;z-index:2;left:0;right:0;bottom:0;padding:10px 11px 11px;font-size:13px;font-weight:600;line-height:1.25;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-shadow:0 1px 8px rgba(0,0,0,.6)}
+  .open{position:absolute;z-index:2;right:10px;bottom:10px;width:26px;height:26px;border-radius:50%;background:var(--accent);display:none;place-items:center}
+  .skel{aspect-ratio:3/4.2;border-radius:20px;border:1px solid var(--line);
+    background:linear-gradient(100deg,rgba(20,30,46,.6) 30%,rgba(60,90,130,.35) 50%,rgba(20,30,46,.6) 70%);background-size:250% 100%;animation:sh 1.3s infinite}
+  @keyframes sh{to{background-position:-250% 0}}
+  .empty{text-align:center;color:var(--dim);padding:34px 20px;line-height:1.55}
   .empty b{color:var(--text)}
-  .more{display:block;margin:16px auto 0;background:var(--panel2);border:1px solid var(--line);padding:12px 20px;border-radius:14px}
+  .hero{text-align:center;padding:44px 16px 20px}
+  .hero .orb{width:92px;height:92px;margin:0 auto 18px;border-radius:30px;display:grid;place-items:center;
+    background:linear-gradient(145deg,rgba(143,208,255,.25),rgba(79,168,224,.08));border:1px solid rgba(143,208,255,.35);
+    box-shadow:0 0 40px rgba(143,208,255,.2),inset 0 0 20px rgba(143,208,255,.1);animation:float 4s ease-in-out infinite}
+  .hero .orb svg{width:42px;height:42px;stroke:var(--accent)}
+  @keyframes float{50%{transform:translateY(-8px)}}
+  .hero h1{margin:0 0 8px;font-size:26px;letter-spacing:-.6px}
+  .hero h1 span{color:var(--accent)}
+  .hero p{color:var(--dim);margin:0 auto;max-width:340px;line-height:1.5;font-size:15px}
+  .tips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+  .tips button{padding:8px 13px;border-radius:999px;background:var(--panel);border:1px solid var(--line);color:var(--text);font-size:14px}
+  .hint{margin-top:22px;font-size:13px;color:#6f86a1}
+  .more{display:block;margin:20px auto 0;background:var(--panel2);border:1px solid var(--line);padding:13px 24px;border-radius:16px;font-weight:600}
   .fallback{display:grid;gap:8px;margin-top:10px}
   .fallback a{display:flex;justify-content:space-between;background:var(--panel);border:1px solid var(--line);padding:14px;border-radius:14px;color:var(--text);text-decoration:none}
   .fallback a span{color:var(--accent)}
-  .sheet{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;z-index:50;align-items:flex-end;justify-content:center}
+  details summary{cursor:pointer}
+  .sheet{position:fixed;inset:0;background:rgba(2,5,10,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;z-index:50;align-items:flex-end;justify-content:center}
   .sheet.open{display:flex}
-  .sheetbox{background:var(--panel);width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:18px 16px calc(20px + var(--safe-bot));max-height:88vh;overflow:auto;border-top:1px solid var(--line)}
-  .sheetbox h2{margin:0 0 6px;font-size:19px}
+  .sheetbox{background:rgba(14,22,34,.96);width:100%;max-width:560px;border-radius:26px 26px 0 0;padding:20px 16px calc(22px + var(--safe-bot));max-height:88vh;overflow:auto;
+    border:1px solid var(--line);box-shadow:0 -20px 60px rgba(0,0,0,.5);animation:up .25s ease}
+  @keyframes up{from{transform:translateY(30px);opacity:0}}
+  .sheetbox h2{margin:0 0 6px;font-size:20px}
   .sheetbox p{color:var(--dim);font-size:14px;line-height:1.45;margin:6px 0 12px}
   .sheetbox a{color:var(--accent)}
   .row{display:flex;gap:8px;margin:8px 0}
   .btn{background:var(--panel2);border:1px solid var(--line);padding:11px 14px;border-radius:12px}
-  .btn.primary{background:var(--accent);color:#06223a;font-weight:700;border:0}
+  .btn.primary{background:linear-gradient(135deg,#bfe6ff,#8fd0ff 45%,#4fa8e0);color:#04182b;font-weight:800;border:0}
   .storelist{display:grid;gap:6px;margin:8px 0 14px}
-  .storeitem{display:flex;align-items:center;gap:10px;background:var(--panel2);padding:10px 12px;border-radius:12px;font-size:14px}
+  .storeitem{display:flex;align-items:center;gap:10px;background:var(--panel2);padding:10px 12px;border-radius:12px;font-size:14px;border:1px solid var(--line)}
   .storeitem small{color:var(--dim);margin-left:auto}
   .x{color:var(--bad);padding:2px 6px}
-  .credits{color:var(--accent)}
   .err{color:var(--bad)}
   hr{border:0;border-top:1px solid var(--line);margin:16px 0}
-
-  .wrap{max-width:1180px;margin:0 auto}
-  .card{transition:transform .15s ease,border-color .15s ease}
-  .card:active{transform:scale(.98)}
-  @media(hover:hover){.card:hover{transform:translateY(-3px);border-color:var(--accent2)} .chip:hover{border-color:var(--accent2)} .go:hover{filter:brightness(1.08)}}
-  .go{transition:filter .15s}
-  .logo{background:linear-gradient(90deg,#eef5fb,#8fd0ff);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .logo span{color:transparent}
+  @media(hover:hover){
+    .card:hover{transform:translateY(-4px);border-color:rgba(143,208,255,.5);box-shadow:0 14px 40px rgba(0,0,0,.45),0 0 30px rgba(143,208,255,.12)}
+    .card:hover .open{display:grid}
+    .chip:hover,.iconbtn:hover{border-color:rgba(143,208,255,.5)}
+    .go:hover{filter:brightness(1.08);box-shadow:0 8px 30px rgba(79,168,224,.5)}
+  }
   @media(min-width:700px){
-    header{padding:16px 0 12px} header .wrap{padding:0 24px}
-    main{padding:18px 24px 0}
-    .storebar{flex-wrap:wrap;overflow:visible}
-    .filters{flex-wrap:wrap;overflow:visible}
-    .grid{gap:16px}
+    header{padding:18px 0 14px} header .wrap{padding:0 24px}
+    main{padding:20px 24px 0}
+    .storebar,.filters{flex-wrap:wrap;overflow:visible;-webkit-mask-image:none}
+    .grid{grid-template-columns:repeat(3,1fr);gap:16px}
     .meta2{font-size:14px}
     .sheet{align-items:center}
-    .sheetbox{border-radius:22px;border:1px solid var(--line);max-height:80vh}
-    form{max-width:720px}
+    .sheetbox{border-radius:26px;max-height:80vh}
+    form{max-width:760px}
+    .hero{padding-top:80px}.hero h1{font-size:38px}
   }
   @media(min-width:1000px){.grid{grid-template-columns:repeat(4,1fr)}}
   @media(min-width:1250px){.grid{grid-template-columns:repeat(5,1fr)}}
@@ -105,12 +148,12 @@
 <header>
 <div class="wrap">
   <div class="top">
-    <div class="logo">mall<span>rat</span></div>
-    <button class="iconbtn" id="favBtn" title="Saved">♡</button>
-    <button class="iconbtn" id="setBtn" style="margin-left:0" title="Settings">⚙︎</button>
+    <div class="logo"><i></i>mallrat</div>
+    <button class="iconbtn" id="favBtn" title="Saved"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg></button>
+    <button class="iconbtn" id="setBtn" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   </div>
   <form id="f">
-    <input type="search" id="q" placeholder="white tube top…" autocomplete="off" enterkeyhint="search">
+    <div class="searchbox"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" id="q" placeholder="white tube top…" autocomplete="off" enterkeyhint="search"></div>
     <button class="go" type="submit">Search</button>
   </form>
   <div class="storebar" id="storebar"></div>
@@ -141,6 +184,7 @@ const DEFAULT_STORES = [
   {id:'dd', name:'Daily Drills', domain:'shopdailydrills.com', url:'https://shopdailydrills.com/search?q='},
 ];
 
+const HEART=`<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>`, ARROW=`<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#04182b" stroke-width="2.6" stroke-linecap="round"><path d="M7 17 17 7M9 7h8v8"/></svg>`;
 const $ = s => document.querySelector(s);
 const ls = {
   get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
@@ -268,23 +312,22 @@ function cardHTML(r){
   const s=storeById(r.store)||{name:r.store};
   const isFav = favs.some(f=>f.link===r.link);
   return `<a class="card" href="${attr(r.link)}" target="_blank" rel="noopener">
-    <div class="imgwrap">
-      <img loading="lazy" src="${attr(r.img)}" data-thumb="${attr(r.thumb||'')}" alt="">
-      <span class="badge">${esc(s.name)}</span>
-      <button class="heart${isFav?' on':''}" data-link="${attr(r.link)}">${isFav?'♥':'♡'}</button>
-    </div>
+    <img loading="lazy" src="${attr(r.img)}" data-thumb="${attr(r.thumb||'')}" alt="">
+    <span class="badge">${esc(s.name)}</span>
+    <button class="heart${isFav?' on':''}" data-link="${attr(r.link)}">${HEART}</button>
     <div class="meta2">${esc(r.title)}</div>
+    <span class="open">${ARROW}</span>
   </a>`;
 }
 function wireCards(root){
   root.querySelectorAll('img').forEach(img=>{
-    img.onerror=()=>{ const t=img.dataset.thumb; if(t && img.src!==t){img.src=t}else{img.closest('.card').style.display='none'} };
+    img.onerror=()=>{ const t=img.dataset.thumb; if(t && img.src!==t){img.src=t}else{img.closest('.card').remove()} };
   });
   root.querySelectorAll('.heart').forEach(h=>h.onclick=e=>{
     e.preventDefault(); e.stopPropagation();
     const link=h.dataset.link; const i=favs.findIndex(f=>f.link===link);
-    if(i>=0){favs.splice(i,1);h.classList.remove('on');h.textContent='♡'}
-    else{const r=state.results.find(x=>x.link===link)||favs.find(x=>x.link===link); if(r){favs.unshift(r);h.classList.add('on');h.textContent='♥'}}
+    if(i>=0){favs.splice(i,1);h.classList.remove('on')}
+    else{const r=state.results.find(x=>x.link===link)||favs.find(x=>x.link===link); if(r){favs.unshift(r);h.classList.add('on')}}
     save();
   });
 }
@@ -352,9 +395,14 @@ $('#favBtn').onclick=showFavs;
 renderStoreBar();
 const lastQ = ls.get('lastQ','');
 if(lastQ) $('#q').value=lastQ;
-if(!ls.get('apiKey','')) setStatus('Tap ⚙︎ to add your free search key first');
+if(!ls.get('apiKey','')) setStatus('Tap the gear to add your search key first');
 else setStatus('Pick your stores, then search');
-$('#below').innerHTML = `<div class="empty">Search once, see every store.<br><b>Add to home screen:</b> in Safari tap Share → “Add to Home Screen”.</div>`;
+$('#below').innerHTML = `<div class="hero"><div class="orb"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l1 13H5L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg></div>
+  <h1>Every store, <span>one scroll.</span></h1>
+  <p>Check the stores you want up top, search once, and tap anything to go straight to it.</p>
+  <div class="tips">${['white tube top','black leggings','linen pants','zip up hoodie'].map(t=>`<button data-try="${t}">${t}</button>`).join('')}</div>
+  <div class="hint">On iPhone: Share → Add to Home Screen</div></div>`;
+document.querySelectorAll('[data-try]').forEach(b=>b.onclick=()=>{ $('#q').value=b.dataset.try; runSearch(b.dataset.try); });
 
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
